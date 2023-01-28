@@ -1,31 +1,26 @@
-import { galleryItems } from "./gallery-items.js";
+import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
-console.log(galleryItems);
-
-const galleryBoxEl = document.querySelector(".gallery");
+const galleryBoxRef = document.querySelector('.gallery');
 const galleryMarkup = createGalleryMarkup(galleryItems);
 
-function createGalleryMarkup(galleryItems) {
-  return galleryItems
-    .map(({ preview, original, description }) => {
-      return `<div class="gallery__item">
-  <a class="gallery__link" href="${original}">
-    <img
-      class="gallery__image"
-      src="${preview}"
-      data-source="${original}"
-      alt="${description}"
-    />
-  </a>
-</div>`
-    })
-    .join("");
+function createGalleryMarkup(items) {
+  return items.map(({ preview, original, description }) => {
+    return `<div class="gallery__item">
+   <a class="gallery__link" href="${original}">
+     <img
+       class="gallery__image"
+       src="${preview}"
+       data-source="${original}"
+       alt="${description}"
+     />
+   </a>
+ </div>`
+  }).join("");
 }
-// console.log(galleryMarkup);
 
-galleryBoxEl.insertAdjacentHTML("beforeend", galleryMarkup);
-galleryBoxEl.addEventListener("click", onImageClick);
+galleryBoxRef.insertAdjacentHTML('beforeend', galleryMarkup);
+galleryBoxRef.addEventListener('click', onImageClick);
 
 function onImageClick(event) {
   event.preventDefault();
@@ -35,22 +30,26 @@ function onImageClick(event) {
   }
 
   createModal(event.target.dataset.source);
-}
-
-let instance;
+};
 
 function createModal(link) {
-  instance = basicLightbox.create(`<img src = "${link}">`);
-
-  instance.show();
-
-  document.addEventListener("keydown", onModalClose);
+  const instance = basicLightbox.create(`
+    <img src="${link}" width="800" height="600">`,
+    {
+    onShow: (instance) => { 
+    document.addEventListener('keydown', onModalKeydown);
+    },
+    onClose: (instance) => {
+      document.removeEventListener('keydown', onModalKeydown);
+  },
+    })
+  function onModalKeydown(event) {
+  if (event.code === "Escape") {
+    instance.close();
+  } 
 }
 
-function onModalClose(evt) {
-  if (evt.code === "Escape") {
-    instance.close();
-  }
-
-  document.removeEventListener("keydown", onModalClose);
+instance.show()
 };
+
+
